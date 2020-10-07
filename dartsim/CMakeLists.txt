@@ -7,6 +7,10 @@ ign_add_component(dartsim INTERFACE
 
 target_link_libraries(${features} INTERFACE ${DART_LIBRARIES})
 target_include_directories(${features} SYSTEM INTERFACE ${DART_INCLUDE_DIRS})
+if (MSVC)
+  # needed by DART, see https://github.com/dartsim/dart/issues/753
+  target_compile_options(${features} INTERFACE "/permissive-")
+endif()
 
 install(
   DIRECTORY include/
