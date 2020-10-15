@@ -47,7 +47,7 @@ set(versioned ${CMAKE_SHARED_LIBRARY_PREFIX}${dartsim_plugin}${CMAKE_SHARED_LIBR
 set(unversioned ${CMAKE_SHARED_LIBRARY_PREFIX}${PROJECT_NAME_NO_VERSION_LOWER}-${engine_name}${CMAKE_SHARED_LIBRARY_SUFFIX})
 if (WIN32)
   # disable MSVC inherit via dominance warning
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250")
+  target_compile_options(${dartsim_plugin} PUBLIC "/wd4250")
   INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${CMAKE_COMMAND} -E copy
       ${IGNITION_PHYSICS_ENGINE_INSTALL_DIR}\/${versioned}
       ${IGNITION_PHYSICS_ENGINE_INSTALL_DIR}\/${unversioned})")
