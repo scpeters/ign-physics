@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <dart/dynamics/BoxShape.hpp>
+#include <dart/dynamics/CapsuleShape.hpp>
 #include <dart/dynamics/CylinderShape.hpp>
 #include <dart/dynamics/MeshShape.hpp>
 #include <dart/dynamics/PlaneShape.hpp>
@@ -89,6 +90,67 @@ Identity ShapeFeatures::AttachBoxShape(
           box, bn->getName() + ":" + _name);
 
   sn->setRelativeTransform(_pose);
+  const std::size_t shapeID = this->AddShape({sn, _name});
+  return this->GenerateIdentity(shapeID, this->shapes.at(shapeID));
+}
+
+/////////////////////////////////////////////////
+Identity ShapeFeatures::CastToCapsuleShape(const Identity &_shapeID) const
+{
+  const auto *shapeInfo = this->ReferenceInterface<ShapeInfo>(_shapeID);
+
+  const dart::dynamics::ShapePtr &shape = shapeInfo->node->getShape();
+
+  if (dynamic_cast<dart::dynamics::CapsuleShape *>(shape.get()))
+    return this->GenerateIdentity(_shapeID, this->Reference(_shapeID));
+
+  return this->GenerateInvalidId();
+}
+
+/////////////////////////////////////////////////
+double ShapeFeatures::GetCapsuleShapeRadius(
+    const Identity &_capsuleID) const
+{
+  const auto *shapeInfo = this->ReferenceInterface<ShapeInfo>(_capsuleID);
+
+  dart::dynamics::CapsuleShape *capsule =
+      static_cast<dart::dynamics::CapsuleShape *>(
+          shapeInfo->node->getShape().get());
+
+  return capsule->getRadius();
+}
+
+/////////////////////////////////////////////////
+double ShapeFeatures::GetCapsuleShapeHeight(
+    const Identity &_capsuleID) const
+{
+  const auto *shapeInfo = this->ReferenceInterface<ShapeInfo>(_capsuleID);
+  dart::dynamics::CapsuleShape *capsule =
+      static_cast<dart::dynamics::CapsuleShape *>(
+          shapeInfo->node->getShape().get());
+
+  return capsule->getHeight();
+}
+
+/////////////////////////////////////////////////
+Identity ShapeFeatures::AttachCapsuleShape(
+    const Identity &_linkID,
+    const std::string &_name,
+    const double _radius,
+    const double _height,
+    const Pose3d &_pose)
+{
+  auto capsule = std::make_shared<dart::dynamics::CapsuleShape>(
+        _radius, _height);
+
+  auto bn = this->ReferenceInterface<LinkInfo>(_linkID)->link;
+  dart::dynamics::ShapeNode *sn =
+      bn->createShapeNodeWith<dart::dynamics::CollisionAspect,
+                              dart::dynamics::DynamicsAspect>(
+          capsule, bn->getName() + ":" + _name);
+
+  sn->setRelativeTransform(_pose);
+
   const std::size_t shapeID = this->AddShape({sn, _name});
   return this->GenerateIdentity(shapeID, this->shapes.at(shapeID));
 }

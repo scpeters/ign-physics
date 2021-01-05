@@ -24,6 +24,7 @@
 #include <dart/constraint/ConstraintSolver.hpp>
 #include <dart/dynamics/BallJoint.hpp>
 #include <dart/dynamics/BoxShape.hpp>
+#include <dart/dynamics/CapsuleShape.hpp>
 #include <dart/dynamics/CylinderShape.hpp>
 #include <dart/dynamics/FreeJoint.hpp>
 #include <dart/dynamics/MeshShape.hpp>
@@ -41,6 +42,7 @@
 #include <ignition/math/Helpers.hh>
 
 #include <sdf/Box.hh>
+#include <sdf/Capsule.hh>
 #include <sdf/Collision.hh>
 #include <sdf/Cylinder.hh>
 #include <sdf/Geometry.hh>
@@ -245,6 +247,14 @@ static ShapeAndTransform ConstructBox(
 }
 
 /////////////////////////////////////////////////
+static ShapeAndTransform ConstructCapsule(
+    const ::sdf::Capsule &_capsule)
+{
+  return {std::make_shared<dart::dynamics::CapsuleShape>(
+        _capsule.Radius(), _capsule.Length())};
+}
+
+/////////////////////////////////////////////////
 static ShapeAndTransform ConstructCylinder(
     const ::sdf::Cylinder &_cylinder)
 {
@@ -301,6 +311,8 @@ static ShapeAndTransform ConstructGeometry(
 {
   if (_geometry.BoxShape())
     return ConstructBox(*_geometry.BoxShape());
+  else if (_geometry.CapsuleShape())
+    return ConstructCapsule(*_geometry.CapsuleShape());
   else if (_geometry.CylinderShape())
     return ConstructCylinder(*_geometry.CylinderShape());
   else if (_geometry.SphereShape())
