@@ -78,14 +78,18 @@ TestWorldPtr LoadWorld(
     const Eigen::Vector3d &_gravity = Eigen::Vector3d{0, 0, -9.8})
 {
   sdf::Root root;
-  const sdf::Errors errors = root.Load(_sdfFile);
+  auto errors = root.Load(_sdfFile);
   EXPECT_TRUE(errors.empty());
   const sdf::World *sdfWorld = root.WorldByIndex(0);
   // Make a copy of the world so we can set the gravity property
   // TODO(addisu) Add a world property feature to set gravity instead of this
   // hack
   sdf::World worldCopy;
-  worldCopy.Load(sdfWorld->Element());
+  errors = worldCopy.Load(sdfWorld->Element());
+  EXPECT_TRUE(errors.empty());
+
+  errors = worldCopy.ValidateGraphs();
+  EXPECT_TRUE(errors.empty());
 
   worldCopy.SetGravity(math::eigen3::convert(_gravity));
   return _engine->ConstructWorld(worldCopy);
