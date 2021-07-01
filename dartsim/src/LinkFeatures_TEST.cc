@@ -86,6 +86,8 @@ TestWorldPtr LoadWorld(
   // hack
   sdf::World worldCopy;
   worldCopy.Load(sdfWorld->Element());
+  auto graphErrors = worldCopy.ValidateGraphs();
+  EXPECT_EQ(0u, graphErrors.size());
 
   worldCopy.SetGravity(math::eigen3::convert(_gravity));
   return _engine->ConstructWorld(worldCopy);
